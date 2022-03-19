@@ -1,31 +1,41 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useContext, useState } from 'react';
 import Modal from 'react-modal';
+
 import closeImg from '../../assets/close.svg';
 import IncomeImg from '../../assets/income.svg';
 import OutcomeImg from '../../assets/outcome.svg';
+import { TransactionsContext } from '../../TransactionsContext';
+
 import { Container, TransactionTypeContainer, RadioBox } from './styles';
 interface newTransactionModalProps {
     isOpen: boolean;
     onRequestClose: () => void;
 
 }
+
 export function NewtransactionModal({ isOpen, onRequestClose }: newTransactionModalProps) {
     const [type, setType] = useState('deposit')
     const [title, setTitle] = useState('');
-    const [value, setValue] = useState(0);
+    const [amount, setAmount] = useState(0);
     const [category, setCategory] = useState('');
+    const { createTransaction } = useContext(TransactionsContext);
 
 
 
-    function handleNewCreateTransaction(event: FormEvent) {
+async function handleNewCreateTransaction(event: FormEvent) {
         event.preventDefault();
-     const  data = {
+      await createTransaction({
             title,
-            value ,
-            category , 
-            type
-        }
+            amount,
+            type,
+            category
+        });
+        setTitle('');
+        setAmount(0);
+        setCategory('');
+        setType('deposit');
 
+    onRequestClose();
     }
 
 
@@ -49,14 +59,14 @@ export function NewtransactionModal({ isOpen, onRequestClose }: newTransactionMo
                     type="text"
                     placeholder="Titulo"
                     value={title}
-                    onChange = {event => setTitle(event.target.value)}
+                    onChange={event => setTitle(event.target.value)}
                 />
 
                 <input
                     type="numeric"
                     placeholder="Valor"
-                    value={value}
-                    onChange ={event => setValue(Number(event.target.value))}
+                    value={amount}
+                    onChange={event => setAmount(Number(event.target.value))}
 
 
                 />
@@ -91,7 +101,7 @@ export function NewtransactionModal({ isOpen, onRequestClose }: newTransactionMo
                     type="text"
                     placeholder="Categoria"
                     value={category}
-                    onChange = {event => setCategory(event.target.value)}
+                    onChange={event => setCategory(event.target.value)}
                 />
 
                 <button
